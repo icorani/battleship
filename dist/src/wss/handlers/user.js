@@ -1,17 +1,29 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createRoom = exports.userConnect = void 0;
+exports.userConnect = void 0;
 const user_1 = require("../entities/user");
 const userConnect = async (ws, data) => {
-    const user = new user_1.User(data.name, data.password, ws);
-    console.log(`Created user:\n\tUserID: ${user.id}\n\tUsername: ${user.userName}\n\tWS: ${user.ws.name}`);
+    let err = false;
+    let user;
+    const userCheck = user_1.Users.check();
+    console.log('Usercheck result: ', userCheck);
+    if (userCheck == false) {
+        user = new user_1.Users(data.name, data.password, ws);
+        console.log(`Created user:\n\tUserID: ${user.id}\n\tUsername: ${user.userName}\n\tWS: ${user.ws}`);
+    }
+    else {
+        user = userCheck;
+        console.log(user[0]);
+        console.log(user);
+        err = (user.password != data.password);
+    }
     const response = {
         type: "reg",
         data: {
             name: user.userName,
             index: user.id,
-            error: false,
-            errorText: "success",
+            error: err,
+            errorText: "",
         },
         id: 0,
     };
@@ -20,8 +32,4 @@ const userConnect = async (ws, data) => {
     ws.send(JSON.stringify(response));
 };
 exports.userConnect = userConnect;
-const createRoom = async (ws) => {
-    console.log(ws);
-};
-exports.createRoom = createRoom;
 //# sourceMappingURL=user.js.map

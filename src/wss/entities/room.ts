@@ -1,20 +1,24 @@
-import { randomUUID, UUID } from "crypto";
-import { User } from "./user";
+import { randomUUID, UUID } from 'crypto';
+import { Users } from './user';
 
-export class Room {
-    roomId: UUID;
-    users: Array<User>;
+export class Rooms {
+  roomId: UUID;
+  users: Array<Users>;
+  static allRooms: Array<Rooms> = [];
 
-    constructor(user: User) {
-        this.roomId = randomUUID();
-        this.users = [user];
-    }
+  constructor(user: Users) {
+    this.roomId = randomUUID();
+    this.users = [user];
+    Rooms.allRooms.push(this);
+  }
 
-    addUserToRoom(user: User) {
-        this.users.push(user);
-    }
+  addUserToRoom(user: Users) {
+    this.users.push(user);
+  }
 
-    // deleteRoom(roomID: UUID){
 
-    // }
 }
+
+export const waitingPlayersRoom = () => {
+  return Rooms.allRooms.filter(room => room.users.length < 2);
+};

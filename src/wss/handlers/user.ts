@@ -1,19 +1,31 @@
-import { User } from "../entities/user";
+import { Users } from "../entities/user";
 import { userData } from "wss/handlers/interfaces";
 
 export const userConnect = async (ws: WebSocket, data: userData) => {
+    let err = false
+    let user;
+    const userCheck = Users.check()
+    console.log('Usercheck result: ', userCheck)
+    if (userCheck == false) {
+        user = new Users(data.name, data.password, ws);
+        console.log(
+          `Created user:\n\tUserID: ${user.id}\n\tUsername: ${user.userName}\n\tWS: ${user.ws}`,
+        );
+    } else {
+        user = userCheck
+        console.log(user[0])
+        console.log(user)
+        err = (user.password != data.password)
 
-    const user = new User(data.name, data.password, ws);
-    console.log(
-        `Created user:\n\tUserID: ${user.id}\n\tUsername: ${user.userName}\n\tWS: ${user.ws.name}`,
-    );
+    }
+
     const response = {
         type: "reg",
         data: {
             name: user.userName,
             index: user.id,
-            error: false,
-            errorText: "success",
+            error: err,
+            errorText: "",
         },
         id: 0,
     };
@@ -25,8 +37,3 @@ export const userConnect = async (ws: WebSocket, data: userData) => {
     ws.send(JSON.stringify(response));
 };
 
-export const createRoom = async (ws: WebSocket) => {
-    console.log(ws)
-    //создать комнату
-    //добавить текущего пользователя в комнату
-};
